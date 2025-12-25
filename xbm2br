@@ -1,0 +1,64 @@
+#!/bin/bash
+
+BYTES=()
+H=0
+W=0
+BPR=0  # bytes per row
+
+# Braille dot positions: row 0-3 map to bits for left/right columns
+SHIFTS=(1 8 2 16 4 32 64 128)
+
+print_braille() {
+    printf '%b' \
+        "\\x$(printf %02x $[0xE0 | $1 >> 12])" \
+        "\\x$(printf %02x $[0x80 | ($1 >> 6) & 0x3F])" \
+        "\\x$(printf %02x $[0x80 | $1 & 0x3F])"
+}
+
+load_xbm() {
+    local file="$1" hex h
+
+    W=$(awk '/^#define.*_width/ {print $3;exit}' "$file")
+    H=$(awk '/^#define.*_height/{print $3;exit}' "$file")
+    BPR=$(( (W + 7) / 8 ))
+
+    for h in $(sed -n '/{/,/}/{/{/d;s/}.*//;s/0x//g;y/,/ /;p;}' "$file"); do
+        BYTES+=($[16#$h])
+    done
+}
+
+print_byte() {
+    local x=$1 y=$2 i row val
+
+    for ((i=0; i<=6; i+=2)); do
+        local dots=0
+        for ((row=0; row<4; row++)); do
+            val=$[ (${BYTES[$(( (y+row)*BPR + x ))]:-0} >> i) & 3 ]
+            (( dots |= (val & 1) * SHIFTS[row*2] + (val >> 1 & 1) * SHIFTS[row*2+1] ))
+        done
+        print_braille $[0x2800 + dots]
+    done
+}
+
+print_img() {
+    local x y
+    for ((y=0; y<H; y+=4)); do
+        for ((x=0; x<BPR; x++)); do
+            print_byte $x $y
+        done
+        echo
+    done
+}
+
+if [ $# -ge 1 ] && [ -f "$1" ]; then
+    load_xbm "$1"
+else
+    echo "Usage: $0 <file.xbm>" >&2
+    echo "Convert XBM (X BitMap) image file to Braille characters." >&2
+    echo "" >&2
+    echo "Example:" >&2
+    echo "  $0 violaLogo.xbm" >&2
+    exit 1
+fi
+
+print_img
