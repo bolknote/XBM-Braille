@@ -4,14 +4,7 @@ Convert XBM (X BitMap) images to Unicode Braille characters for terminal display
 
 ## Example
 
-```
-$ ./xbm2br violaLogo.xbm
-⢀⢔⣪⣭⣭⣲⠀⢠⣒⣒⠤⡀⠀⠀⠀⠀
-⡎⣾⣿⣿⣿⡿⠻⠛⠟⠻⠻⠿⠤⠤⠦⠦
-⢣⢻⣿⠱⣦⢻⡿⣛⢿⣿⡿⠟⠀⠀⠁⠁
-⠀⠙⠻⠧⠹⣧⠃⣿⢐⠂⣀⠀⡇⠔⢢⠀
-⠀⠀⠀⠀⠀⠈⠳⠟⠸⠘⠵⠃⠇⠪⠽⠄
-```
+<img width="500" height="250" src="https://github.com/user-attachments/assets/adfffc78-66ce-49ff-a780-9a2af798f273" />
 
 ## How It Works
 
